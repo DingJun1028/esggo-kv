@@ -1,0 +1,96 @@
+packages:
+  - 'apps/*'
+  - 'apps/*/functions'
+  - 'cli/*'
+  - 'packages/*'
+  - '.'
+
+overrides:
+  "tar": ">=7.5.21 <8"
+  "postcss": ">=8.5.23"
+  "uuid": ">=11.1.1"
+  "gaxios": ">=7.1.4"
+  "glob": ">=10.5.0"
+  "minimatch": ">=9.0.7"
+  "fast-uri": ">=3.1.5 <4"
+  "fast-xml-parser": ">=5.10.1"
+  "brace-expansion": ">=5.0.9"
+  # 安全修補：必須加 <major 上界，裸 '>=' 會讓 pnpm 跳到跨 major（AGENTS.md #4）
+  "nanoid": ">=3.3.18 <4"
+  "dompurify": ">=3.4.12 <4"
+  "body-parser": ">=1.20.6 <2"
+  "protobufjs": ">=7.6.5 <8"
+  # ── 2026-08-11 dependabot 批次修補 (pnpm audit 13 項) ──
+  "esbuild": ">=0.24.3 <1"
+  "@tootallnate/once": ">=2.0.1 <3"
+  "adm-zip": ">=0.6.0 <1"
+  "pdfjs-dist": ">=6.2.108 <7"
+  "@opentelemetry/core": ">=2.8.0 <3"
+  "@opentelemetry/sdk-node": ">=0.217.0 <1"
+  "@opentelemetry/auto-instrumentations-node": ">=0.75.0 <1"
+  "@opentelemetry/propagator-jaeger": ">=2.9.0 <3"
+  # ── 2026-08-17 Dependabot 24 告警追加 (放寬到修補版所在 major) ──
+  # sharp 依 AGENTS.md #7 排除 (next 限制 0.34.5)；chromadb 僅 .venv 不納入 pnpm
+  # vitest 最新穩定 4.1.10 (5.x 仍 beta, 不跨)；CVE 上游未修, 先鎖穩定最新
+  "vitest": ">=4.1.10"
+  "vite": ">=7.0.0 <8"
+  # ⛔ 回退 (2026-08-17 09:00 部署前驗證): undici@8 移除了 lib/handler/wrap-handler.js，
+  #    jsdom@29.1.1 硬性 require 該路徑 → OmniCore CI / learning-center-ci / VPS 建置三紅。
+  #    jsdom@29 只接受 ^7.25.0；跨 major 亦違反 AGENTS.md #5。維持 7.x 修補版。
+  "undici": ">=7.29.0 <8"
+  "js-yaml": ">=5.0.0 <6"
+  "hono": ">=4.0.0 <5"
+  # 排除 (AGENTS.md #7)：sharp <0.35.0 — next 為 devDep、專案 0 處用 next/image、next@16 只接受 ^0.34.5
+  #   chromadb (pip critical) — 僅出現在 .venv 虛擬環境，非提交之 requirements，不納入 pnpm 管線
+
+allowBuilds:
+  '@firebase/util': false
+  '@google/genai': false
+  '@prisma/client': true
+  '@prisma/engines': true
+  core-js: true
+  esbuild: true
+  prisma: true
+  protobufjs: false
+  sharp: true
+  sqlite3: false
+  tesseract.js: true
+  unrs-resolver: false
+
+minimumReleaseAgeExclude:
+  - '@typescript-eslint/eslint-plugin@8.62.1'
+  - '@typescript-eslint/project-service@8.62.1'
+  - '@typescript-eslint/scope-manager@8.62.1'
+  - '@typescript-eslint/tsconfig-utils@8.62.1'
+  - '@typescript-eslint/type-utils@8.62.1'
+  - '@typescript-eslint/types@8.62.1'
+  - '@typescript-eslint/typescript-estree@8.62.1'
+  - '@typescript-eslint/utils@8.62.1'
+  - '@typescript-eslint/visitor-keys@8.62.1'
+  - postcss@8.5.10
+  - uuid@11.1.1
+  - react-native-screens@4.26.0
+  - '@cloudflare/workers-types@5.20260719.1'
+  - tar@7.5.7
+  - tar@7.5.3
+  - tar@7.5.8
+  - tar@7.5.10
+  - tar@7.5.11
+  - tar@7.5.4
+  - '@tootallnate/once@2.0.1'
+  - '@opentelemetry/auto-instrumentations-node@0.75.0'
+  - '@opentelemetry/sdk-node@0.217.0'
+  - tar@7.5.16
+  - '@opentelemetry/core@2.8.0'
+  - adm-zip@0.6.0
+  - tar@7.5.18
+  - tar@7.5.19
+  - tar@7.5.17
+  - '@opentelemetry/propagator-jaeger@2.9.0'
+  - sharp@0.35.0
+  - tar@7.5.21
+  - js-yaml@4.3.1
+
+onlyBuiltDependencies:
+  - tesseract.js
+  - sqlite3

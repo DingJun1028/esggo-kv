@@ -1,0 +1,85 @@
+import { program } from 'commander';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { readFileSync } from 'fs';
+import { gatewayRequest, loadGatewayConfig } from './gateway.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const pkg = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
+
+program
+  .name('oa')
+  .description('OA-Team 30 萬能代理小隊命令控制介面')
+  .version(pkg.version, '-v, --version', '顯示版本號')
+  .hook('preAction', (thisCommand) => {
+    console.log(`[5T:Traceable] source_origin=oa-cli command=${thisCommand.name()}`);
+  });
+
+program
+  .command('status')
+  .description('查詢 OA-Team 30 代理陣列狀態（MECE 分工/負載/健康）')
+  .option('--dry-run', '預演模式：不實際查詢，僅回報將執行動作')
+  .option('--live', '實查模式：發出真實 Gateway 請求')
+  .action(async (opts) => {
+    if (!opts.live || opts.dryRun) {
+      console.log('[DRY-RUN] oa status → 將查詢：swarm_matrix, array_health, task_queue');
+      console.log('[5T:Trustworthy] dry-run 無副作用，Hash Lock 預留');
+      return;
+    }
+    try {
+      const data = await gatewayRequest('/oa/status');
+      console.log('[LIVE]', JSON.stringify(data, null, 2));
+    } catch (e) {
+      console.log('[BLOCKER] Gateway 查詢失敗:', (e as Error).message);
+    }
+  });
+
+const agents = program.command('agents').description('30 位代理管理');
+
+agents
+  .command('list')
+  .description('列出 30 位代理（01-30）與所屬陣列')
+  .option('--array <id>', '篩選陣列 1-5')
+  .option('--dry-run', '預演模式')
+  .option('--live', '實查模式')
+  .action(async (opts) => {
+    if (!opts.live || opts.dryRun) {
+      console.log(`[DRY-RUN] oa agents list --array=${opts.array || 'all'} → 將回傳代理矩陣`);
+      console.log('[5T:Traceable] source_origin=oa-cli agents list');
+      return;
+    }
+    try {
+      const data = await gatewayRequest(`/oa/agents?array=${opts.array || 'all'}`);
+      console.log('[LIVE]', JSON.stringify(data, null, 2));
+    } catch (e) {
+      console.log('[BLOCKER] Gateway 查詢失敗:', (e as Error).message);
+    }
+  });
+
+const task = program.command('task').description('任務派發與管理');
+
+task
+  .command('dispatch <prompt>')
+  .description('派發任務到指定陣列（經 Hermes 路由）')
+  .option('--array <id>', '目標陣列 1-5，預設由蜂王路由')
+  .option('--dry-run', '預演模式')
+  .option('--live', '實查模式')
+  .action(async (prompt, opts) => {
+    if (!opts.live || opts.dryRun) {
+      console.log(`[DRY-RUN] oa task dispatch "${prompt}" → array=${opts.array || 'auto'}`);
+      console.log('[5T:Trustworthy] 派發經 Key-Ω 簽印，不可篡改');
+      return;
+    }
+    try {
+      const data = await gatewayRequest('/oa/task/dispatch', undefined, { prompt, array: opts.array });
+      console.log('[LIVE]', JSON.stringify(data, null, 2));
+    } catch (e) {
+      console.log('[BLOCKER] Gateway 派發失敗:', (e as Error).message);
+    }
+  });
+
+program.parseAsync(process.argv).catch((err) => {
+  console.error('[ERROR]', err.message);
+  process.exit(1);
+});

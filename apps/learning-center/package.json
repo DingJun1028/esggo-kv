@@ -32,8 +32,8 @@
     "jsdom": "^29.1.1",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.19",
-    "vite": "^6.4.3",
-    "postcss": "^8.5.25",
+    "vite": "^8.2.1",
+    "postcss": "^8.5.23",
     "tailwindcss": "^3.4.19",
     "vite": "^6.4.3",
     "vitest": "^4.1.10"
